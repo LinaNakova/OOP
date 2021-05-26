@@ -1,235 +1,201 @@
+#include<iostream>
+#include<cstring>
 
-#include <iostream>
-#include <cstring>
 using namespace std;
-// vashiot kod ovde
-class IceCream{
+
+// вашиот код
+class Avtomobil{
 private:
-    char *ime=0;
-    char sostav[100]={0};
-    float cena=0;
-    int popust=0;
-public:
-    IceCream()
+    char boja[20];
+    char brend[20];
+    char model[20];
+
+    public:
+    Avtomobil(){}
+    Avtomobil(char *boja, char *brend, char *model)
     {
+      strcpy(this->boja,boja);
+      strcpy(this->brend,brend);
+      strcpy(this->model,model);
     }
-    IceCream(char *ime, char sostav[],float cena)
+    Avtomobil(const Avtomobil &a)
     {
-        this->ime = new char [strlen(ime)+1];
-        strcpy(this->ime,ime);
-        strcpy(this->sostav,sostav);
+       strcpy(this->boja,a.boja);
+      strcpy(this->brend,a.brend);
+      strcpy(this->model,a.model);
+    }
+    Avtomobil & operator = (const Avtomobil &a)
+    {
+        if(this != &a)
+        {
+        strcpy(this->boja,a.boja);
+        strcpy(this->brend,a.brend);
+        strcpy(this->model,a.model);
+        }
+        return *this;
+    }
+    void pecati()
+    {
+    cout<<boja<<" "<<brend<<" "<<model<<endl;
+    }
+};
+class ParkingPlac{
+private:
+    char adresa[20];
+    char *id;
+    int cena;
+    int zarabotka;
+    Avtomobil *avtomobili;
+    int parkirani;
+public:
+    ParkingPlac()
+    {
+        id = new char [0];
+        cena=0;
+        zarabotka=0;
+        avtomobili = new Avtomobil [0];
+        parkirani=0;
+    }
+    ParkingPlac (char *adresa,char *id,int cena)
+    {
+        strcpy(this->adresa,adresa);
         this->cena=cena;
+        this->id = new char [strlen(id)+1];
+        strcpy(this->id,id);
     }
-    IceCream(const IceCream &ic)
+    ~ParkingPlac()
     {
-        this->ime = new char [strlen(ic.ime)+1];
-        strcpy(this->ime,ic.ime);
-        strcpy(this->sostav,ic.sostav);
-        this->cena=ic.cena;
-        this->popust=ic.popust;
+        delete [] id;
+        delete [] avtomobili;
     }
-    IceCream & operator = (const IceCream &ic)
-    {
-        delete [] ime;
-        this->ime = new char [strlen(ic.ime)+1];
-        strcpy(this->ime,ic.ime);
-        strcpy(this->sostav,ic.sostav);
-        this->cena=ic.cena;
-        this->popust=ic.popust;
+    ParkingPlac(const ParkingPlac & PP){
+        strcpy(this->adresa, PP.adresa);
+        this->id=new char [strlen(PP.id)+1];
+        strcpy(this->id, PP.id);
+        this->cena=PP.cena;
+        this->zarabotka=PP.zarabotka;
+        this->avtomobili=new Avtomobil [PP.parkirani];
+        for (int i=0; i<PP.parkirani; i++)
+            avtomobili[i]=PP.avtomobili[i];
+        this->parkirani=PP.parkirani;
     }
-    friend ostream & operator <<(ostream &out , const IceCream &ic)
+    ParkingPlac & operator =(const ParkingPlac &p)
     {
-        out<<ic.ime<<" "<<ic.sostav<<" "<<ic.cena;
-        float cenasopopust;
-        if(ic.popust != 0)
-        {cenasopopust=ic.cena-(ic.cena*ic.popust)/100;
-        out<<"("<<cenasopopust<<")";
+        if(this != &p)
+        {
+            delete [] avtomobili;
+            delete [] id;
+            strcpy(this->adresa,p.adresa);
+        this->cena=p.cena;
+        this->id = new char [strlen(p.id)+1];
+        strcpy(this->id,p.id);
+        this->zarabotka=p.zarabotka;
+        this->avtomobili= new Avtomobil [p.parkirani];
+        for (int i=0; i<p.parkirani; i++)
+            avtomobili[i]=p.avtomobili[i];
+        this->parkirani=p.parkirani;
         }
-        return out;
-    }
-    IceCream & operator ++()
-    {
-        popust+=5;
         return *this;
     }
-    IceCream operator + (const char *extra)
+    void pecati()
     {
-        char *novoime = new char [strlen(ime) + strlen(extra) +4];
-        strcat(novoime,ime);
-        strcat(novoime," + ");
-        strcat(novoime,extra);
-
-        IceCream res(novoime,sostav,cena+10);
-        res.setDiscount(popust);
-        return res;
-    }
-    void setDiscount(int discount)
-    {
-        if(discount>=0 && discount <=100)
-            popust+=discount;
-    }
-    void setName(char *name)
-    {
-        delete [] ime;
-        ime = new char [strlen(name)+1];
-        strcpy(ime,name);
-    }
-    ~IceCream()
-    {
-        delete [] ime;
-    }
-
-
-};
-class IceCreamShop{
-private:
-    char ime[50]={0};
-    IceCream *sladoledi=0;
-    int brojsladoledi=0;
-public:
-    IceCreamShop()
-    {
-    }
-    IceCreamShop(char *ime)
-    {
-        strcpy(this->ime,ime);
-    }
-    IceCreamShop(const IceCreamShop &s)
-    {
-        strcpy(ime,s.ime);
-        sladoledi = new IceCream [s.brojsladoledi];
-        brojsladoledi=s.brojsladoledi;
-    }
-    ~IceCreamShop()
-    {
-        delete [] sladoledi;
-    }
-    IceCreamShop & operator +=(IceCream &i)
-    {
-        IceCream *tmp = new IceCream[brojsladoledi+1];
-        for(int i=0;i<brojsladoledi;i++)
+        if(zarabotka!=0)
         {
-            tmp[i]=sladoledi[i];
+            cout<<id<<" "<<adresa<<" "<<zarabotka<<" denari"<<endl;
         }
-        tmp[brojsladoledi++]=i;
-        delete [] sladoledi;
-        sladoledi=tmp;
-        return *this;
+        else
+            cout<<id<<" "<<adresa<<" ";
     }
-    friend ostream & operator <<(ostream &out, const IceCreamShop &ic)
+    void platiCasovi(int casovi)
     {
-        out<<ic.ime<<endl;
-        for(int i=0;i<ic.brojsladoledi;i++)
-        {
-            out<<ic.sladoledi[i];
-        }
-        return out;
+        zarabotka+=cena*casovi;
     }
+    bool daliIstaAdresa(ParkingPlac p)
+    {
+        return strcmp(this->adresa,p.adresa)==0;
+    }
+    void parkirajVozilo(Avtomobil &novoVozilo)
+    {
+        Avtomobil *tmp = new Avtomobil [parkirani+1];
+        for(int i=0;i<parkirani;i++)
+            tmp[i]=avtomobili[i];
+        tmp[parkirani++]=novoVozilo;
+        delete [] avtomobili;
+        avtomobili=tmp;
+    }
+    void pecatiParkiraniVozila()
+    {
+        cout<<"Vo parkingot se parkirani slednite vozila:"<<endl;
+        for(int i=0;i<parkirani;i++)
+        {cout<<i+1<<".";
+        avtomobili[i].pecati();
+        }
 
+    }
+    char *getId()
+    {
+        return id;
+    }
 };
-// zabraneto e menuvanje na main funkcijata
+int main(){
 
-int main() {
-    char name[100];
-    char ingr[100];
-    float price;
-    int discount;
-
-    int testCase;
-
-    cin >> testCase;
-	cin.get();
-    if(testCase == 1) {
-        cout << "====== TESTING IceCream CLASS ======" << endl;
-        cin.getline(name,100);
-        cin.getline(ingr,100);
-        cin >> price;
-        cin >> discount;
-        cout << "CONSTRUCTOR" << endl;
-        IceCream ic1(name, ingr, price);
-        ic1.setDiscount(discount);
-        cin.get();
-        cin.getline(name,100);
-        cin.getline(ingr,100);
-        cin >> price;
-        cin >> discount;
-        IceCream ic2(name, ingr, price);
-        ic2.setDiscount(discount);
-        cout << "OPERATOR <<" << endl;
-        cout << ic1 << endl;
-        cout << ic2 << endl;
-        cout << "OPERATOR ++" << endl;
-        ++ic1;
-        cout << ic1 << endl;
-        cout << "OPERATOR +" << endl;
-        IceCream ic3 = ic2 + "chocolate";
-        cout << ic3 << endl;
-    } else if(testCase == 2) {
-        cout << "====== TESTING IceCream CONSTRUCTORS ======" << endl;
-        cin.getline(name,100);
-        cin.getline(ingr,100);
-        cin >> price;
-        cout << "CONSTRUCTOR" << endl;
-        IceCream ic1(name, ingr, price);
-        cout << ic1 << endl;
-        cout << "COPY CONSTRUCTOR" << endl;
-        IceCream ic2(ic1);
-        cin.get();
-        cin.getline(name,100);
-        ic2.setName(name);
-        cout << ic1 << endl;
-        cout << ic2 << endl;
-        cout << "OPERATOR =" << endl;
-        ic1 = ic2;
-        cin.getline(name,100);
-        ic2.setName(name);
-        cout << ic1 << endl;
-        cout << ic2 << endl;
-
-        cin >> discount;
-        ic1.setDiscount(discount);
+	ParkingPlac p[100];
+	int n,m;
+	char adresa[50],id[50];
+	int brojcasovi,cenacas;
+	cin>>n;
+	if(n > 0){
 
 
-    } else if(testCase == 3) {
-        cout << "====== TESTING IceCreamShop ======" << endl;
-        char icsName[50];
-        cin.getline(icsName,100);
-        cout << "CONSTRUCTOR" << endl;
-        IceCreamShop ics(icsName);
-        int n;
-        cin >> n;
-        cout << "OPERATOR +=" << endl;
-        for(int i = 0; i < n; ++i) {
-            cin.get();
-            cin.getline(name,100);
-        	cin.getline(ingr,100);
-            cin >> price;
-            IceCream ic(name, ingr, price);
-            ics += ic;
-        }
-        cout << ics;
-    } else if(testCase == 4) {
-        cout << "====== TESTING IceCreamShop CONSTRUCTORS ======" << endl;
-        char icsName[50];
-        cin.getline(icsName,100);
-        IceCreamShop ics(icsName);
-        int n;
-        cin >> n;
-        for(int i = 0; i < n; ++i) {
-            cin.get();
-            cin.getline(name,100);
-        	cin.getline(ingr,100);
-            cin >> price;
-            IceCream ic(name, ingr, price);
-            ics += ic;
-        }
-        IceCream x("FINKI fruits", "strawberry ice cream, raspberry ice cream, blueberry ice cream", 60);
-        IceCreamShop icp = ics;
-        ics+=x;
-        cout << ics << endl;
-        cout << icp << endl;
-    }
+		for (int i=0;i<n;i++){
+	        cin.get();
+			cin.getline(adresa,50);
+			cin>>id>>cenacas;
 
+			ParkingPlac edna(adresa,id,cenacas);
 
-    return 0;
+	        p[i]=edna;
+		}
+
+		//plakjanje
+		cin>>m;
+		for (int i=0;i<m;i++){
+
+			cin>>id>>brojcasovi;
+
+	        int findId=false;
+	        for (int j=0;j<m;j++){
+	            if (strcmp(p[j].getId(),id)==0){
+	                p[j].platiCasovi(brojcasovi);
+	                findId=true;
+	            }
+	        }
+			if (!findId)
+	        cout<<"Ne e platen parking. Greshen ID."<<endl;
+		}
+
+	    cout<<"========="<<endl;
+	    ParkingPlac pCentar("Cvetan Dimov","C10",80);
+		for (int i=0;i<n;i++)
+	        if (p[i].daliIstaAdresa(pCentar))
+	            p[i].pecati();
+	} else {
+
+		ParkingPlac najdobarPlac("Mars", "1337", 1);
+	    int brVozila;
+	    cin >> brVozila;
+	    for(int i = 0; i < brVozila; ++i){
+
+	    	char boja[20];
+	    	char brend[20];
+	    	char model[20];
+
+	    	cin >> boja >> brend >> model;
+	    	Avtomobil novAvtomobil(boja, brend, model);
+	    	najdobarPlac.parkirajVozilo(novAvtomobil);
+	    }
+	    if(brVozila != 0)
+	    najdobarPlac.pecatiParkiraniVozila();
+
+	}
 }
